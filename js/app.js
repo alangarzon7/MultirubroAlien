@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initSoundToggle();
   initQrModal();
   initFlyerLightbox();
+  initGitHubSyncUI();
 
   // Listen to State Changes
   window.appStore.subscribe((state, event) => {
@@ -840,6 +841,81 @@ function initSoundToggle() {
   updateIcons();
 }
 
+// --- GitHub Sync UI & Actions ---
+function initGitHubSyncUI() {
+  const saveTokenBtn = document.getElementById('save-gh-token-btn');
+  const tokenInput = document.getElementById('gh-token-input');
+  const globalSyncBtn = document.getElementById('global-sync-github-btn');
+
+  if (tokenInput) {
+    tokenInput.value = window.githubSync.getToken();
+  }
+
+  updateGitHubStatusBadge();
+
+  if (saveTokenBtn && tokenInput) {
+    saveTokenBtn.addEventListener('click', () => {
+      const token = tokenInput.value.trim();
+      if (!token) {
+        showToast('⚠️ Ingresa un token válido', 'error');
+        return;
+      }
+      window.githubSync.setToken(token);
+      updateGitHubStatusBadge();
+      showToast('🔑 Token de GitHub guardado en este navegador', 'success');
+    });
+  }
+
+  if (globalSyncBtn) {
+    globalSyncBtn.addEventListener('click', async () => {
+      await performGlobalGitHubSync();
+    });
+  }
+}
+
+function updateGitHubStatusBadge() {
+  const badge = document.getElementById('gh-status-badge');
+  if (!badge) return;
+
+  if (window.githubSync.isConfigured()) {
+    badge.className = 'text-[10px] px-2 py-0.5 rounded-full font-tech font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+    badge.textContent = '🟢 Conectado a GitHub';
+  } else {
+    badge.className = 'text-[10px] px-2 py-0.5 rounded-full font-tech font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/40';
+    badge.textContent = '⚠️ Token pendiente';
+  }
+}
+
+async function performGlobalGitHubSync() {
+  const syncBtn = document.getElementById('global-sync-github-btn');
+  if (!window.githubSync.isConfigured()) {
+    showToast('⚠️ Configura tu Token de GitHub en la pestaña "🔑 Conexión GitHub"', 'error');
+    // Switch to GitHub tab
+    const ghTabBtn = document.querySelector('[data-tab-target="admin-tab-github"]');
+    if (ghTabBtn) ghTabBtn.click();
+    return;
+  }
+
+  if (syncBtn) {
+    syncBtn.disabled = true;
+    syncBtn.innerHTML = `<span>⏳ Sincronizando con GitHub...</span>`;
+  }
+
+  try {
+    showToast('🚀 Guardando cambios en GitHub main...', 'info');
+    await window.githubSync.syncDatabase(window.appStore.config, window.appStore.products);
+    showToast('✅ ¡Todos los cambios fueron guardados en GitHub con éxito!', 'success');
+  } catch (err) {
+    console.error('GitHub Sync Error:', err);
+    showToast(`⛔ Error al sincronizar: ${err.message}`, 'error');
+  } finally {
+    if (syncBtn) {
+      syncBtn.disabled = false;
+      syncBtn.innerHTML = `<span>🚀 GUARDAR CAMBIOS EN GITHUB</span>`;
+    }
+  }
+}
+
 // --- Admin Modal & Management Dashboard ---
 function initAdminModal() {
   const adminModal = document.getElementById('admin-modal');
@@ -901,9 +977,9 @@ function initAdminModal() {
   // Product Form Handler
   const prodForm = document.getElementById('admin-product-form');
   if (prodForm) {
-    prodForm.addEventListener('submit', (e) => {
+    prodForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      handleSaveProduct();
+      await handleSaveProduct();
     });
   }
 
@@ -920,9 +996,9 @@ function initAdminModal() {
   // Banner / Flyer Form Handler
   const bannerForm = document.getElementById('admin-banner-form');
   if (bannerForm) {
-    bannerForm.addEventListener('submit', (e) => {
+    bannerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      handleSaveBanner();
+      await handleSaveBanner();
     });
   }
 
@@ -938,9 +1014,9 @@ function initAdminModal() {
   // Config Form Handler
   const configForm = document.getElementById('admin-config-form');
   if (configForm) {
-    configForm.addEventListener('submit', (e) => {
+    configForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      handleSaveConfig();
+      await handleSaveConfig();
     });
   }
 
@@ -948,17 +1024,20 @@ function initAdminModal() {
   const addCatBtn = document.getElementById('admin-add-cat-btn');
   const catInput = document.getElementById('admin-new-cat-input');
   if (addCatBtn && catInput) {
-    addCatBtn.addEventListener('click', () => {
+    addCatBtn.addEventListener('click', async () => {
       const val = catInput.value.trim();
       if (val) {
         window.appStore.addCategory(val);
         catInput.value = '';
         showToast(`✅ Categoría "${val}" agregada`, 'success');
+        if (window.githubSync.isConfigured()) {
+          await performGlobalGitHubSync();
+        }
       }
     });
   }
 
-  // GitHub Data Export Helpers
+  // Download JSON fallback
   const downloadJsonBtn = document.getElementById('download-json-btn');
   if (downloadJsonBtn) {
     downloadJsonBtn.addEventListener('click', () => {
@@ -966,20 +1045,10 @@ function initAdminModal() {
     });
   }
 
-  const copyJsonBtn = document.getElementById('copy-json-btn');
-  if (copyJsonBtn) {
-    copyJsonBtn.addEventListener('click', () => {
-      const dataStr = JSON.stringify(window.appStore.products, null, 2);
-      navigator.clipboard.writeText(dataStr).then(() => {
-        showToast('📋 JSON de productos copiado al portapapeles', 'success');
-      });
-    });
-  }
-
   // Delegation for admin product actions (edit, delete, toggle stock)
   const adminProdList = document.getElementById('admin-products-table-body');
   if (adminProdList) {
-    adminProdList.addEventListener('click', (e) => {
+    adminProdList.addEventListener('click', async (e) => {
       const btn = e.target.closest('button');
       if (!btn) return;
       const prodId = btn.dataset.productId;
@@ -990,10 +1059,16 @@ function initAdminModal() {
         if (confirm('¿Seguro que deseas eliminar este producto de la galaxia?')) {
           window.appStore.deleteProduct(prodId);
           showToast('🗑️ Producto eliminado', 'info');
+          if (window.githubSync.isConfigured()) {
+            await performGlobalGitHubSync();
+          }
         }
       } else if (btn.classList.contains('admin-toggle-stock')) {
         window.appStore.toggleProductStock(prodId);
         showToast('🔄 Estado de stock actualizado', 'success');
+        if (window.githubSync.isConfigured()) {
+          await performGlobalGitHubSync();
+        }
       }
     });
   }
@@ -1001,7 +1076,7 @@ function initAdminModal() {
   // Delegation for banner list actions (delete)
   const adminBannersList = document.getElementById('admin-banners-list');
   if (adminBannersList) {
-    adminBannersList.addEventListener('click', (e) => {
+    adminBannersList.addEventListener('click', async (e) => {
       const btn = e.target.closest('button');
       if (!btn) return;
       const bannerId = btn.dataset.bannerId;
@@ -1009,6 +1084,9 @@ function initAdminModal() {
         if (confirm('¿Eliminar este flyer promocional?')) {
           window.appStore.deletePromoBanner(bannerId);
           showToast('🗑️ Flyer eliminado', 'info');
+          if (window.githubSync.isConfigured()) {
+            await performGlobalGitHubSync();
+          }
         }
       }
     });
@@ -1017,13 +1095,16 @@ function initAdminModal() {
   // Delegation for category deletion
   const adminCatList = document.getElementById('admin-categories-list');
   if (adminCatList) {
-    adminCatList.addEventListener('click', (e) => {
+    adminCatList.addEventListener('click', async (e) => {
       const btn = e.target.closest('.delete-cat-btn');
       if (!btn) return;
       const catName = btn.dataset.categoryName;
       if (confirm(`¿Eliminar categoría "${catName}"?`)) {
         window.appStore.deleteCategory(catName);
         showToast('🗑️ Categoría eliminada', 'info');
+        if (window.githubSync.isConfigured()) {
+          await performGlobalGitHubSync();
+        }
       }
     });
   }
@@ -1042,6 +1123,7 @@ function renderAdmin() {
 
   loginView.classList.add('hidden');
   dashboardView.classList.remove('hidden');
+  updateGitHubStatusBadge();
 
   // Populate Config Form Inputs
   const config = window.appStore.config;
@@ -1138,14 +1220,15 @@ function renderAdmin() {
   }
 }
 
-function handleSaveProduct() {
+async function handleSaveProduct() {
   const id = document.getElementById('edit-prod-id').value;
   const name = document.getElementById('prod-name-input').value.trim();
   const category = document.getElementById('prod-category-select').value;
   const price = parseFloat(document.getElementById('prod-price-input').value) || 0;
   const originalPrice = parseFloat(document.getElementById('prod-orig-price-input').value) || null;
   const description = document.getElementById('prod-desc-input').value.trim();
-  const image = document.getElementById('prod-img-input').value.trim();
+  let image = document.getElementById('prod-img-input').value.trim();
+  const fileInput = document.getElementById('prod-file-input');
   const badge = document.getElementById('prod-badge-input').value.trim();
   const inStock = document.getElementById('prod-stock-checkbox').checked;
   const isPromo = document.getElementById('prod-promo-checkbox').checked;
@@ -1153,6 +1236,22 @@ function handleSaveProduct() {
   if (!name || price <= 0) {
     showToast('⚠️ Ingresa un nombre y precio válido', 'error');
     return;
+  }
+
+  // Handle uploaded file if present
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0];
+    if (window.githubSync.isConfigured()) {
+      showToast('📤 Subiendo imagen a GitHub...', 'info');
+      try {
+        image = await window.githubSync.uploadImage(file);
+      } catch (err) {
+        console.warn('Could not upload to GitHub, using local data URL:', err);
+        image = await readFileAsDataURL(file);
+      }
+    } else {
+      image = await readFileAsDataURL(file);
+    }
   }
 
   const productData = {
@@ -1172,7 +1271,12 @@ function handleSaveProduct() {
   document.getElementById('admin-product-form').reset();
   document.getElementById('edit-prod-id').value = '';
   document.getElementById('prod-form-title').textContent = '➕ Agregar Nuevo Producto';
-  showToast('✅ Producto guardado correctamente', 'success');
+  showToast('✅ Producto guardado localmente', 'success');
+
+  // Auto-sync to GitHub if configured
+  if (window.githubSync.isConfigured()) {
+    await performGlobalGitHubSync();
+  }
 }
 
 function editProductInForm(productId) {
@@ -1198,13 +1302,30 @@ function editProductInForm(productId) {
   document.getElementById('admin-product-form').scrollIntoView({ behavior: 'smooth' });
 }
 
-function handleSaveBanner() {
+async function handleSaveBanner() {
   const id = document.getElementById('edit-banner-id').value;
   const title = document.getElementById('banner-title-input').value.trim();
-  const image = document.getElementById('banner-img-input').value.trim();
+  let image = document.getElementById('banner-img-input').value.trim();
+  const fileInput = document.getElementById('banner-file-input');
   const badge = document.getElementById('banner-badge-input').value.trim();
   const subtitle = document.getElementById('banner-sub-input').value.trim();
   const wspText = document.getElementById('banner-wsp-input').value.trim();
+
+  // Handle uploaded file if present
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0];
+    if (window.githubSync.isConfigured()) {
+      showToast('📤 Subiendo flyer a GitHub...', 'info');
+      try {
+        image = await window.githubSync.uploadImage(file);
+      } catch (err) {
+        console.warn('Could not upload to GitHub, using local data URL:', err);
+        image = await readFileAsDataURL(file);
+      }
+    } else {
+      image = await readFileAsDataURL(file);
+    }
+  }
 
   if (!title || !image) {
     showToast('⚠️ Ingresa título e imagen del flyer', 'error');
@@ -1223,10 +1344,15 @@ function handleSaveBanner() {
   window.appStore.savePromoBanner(bannerData);
   document.getElementById('admin-banner-form').reset();
   document.getElementById('edit-banner-id').value = '';
-  showToast('✅ Flyer de promoción guardado', 'success');
+  showToast('✅ Flyer de promoción guardado localmente', 'success');
+
+  // Auto-sync to GitHub if configured
+  if (window.githubSync.isConfigured()) {
+    await performGlobalGitHubSync();
+  }
 }
 
-function handleSaveConfig() {
+async function handleSaveConfig() {
   const newConfig = {
     storeName: document.getElementById('admin-cfg-store-name').value.trim(),
     whatsapp: document.getElementById('admin-cfg-wsp').value.trim(),
@@ -1242,7 +1368,12 @@ function handleSaveConfig() {
   };
 
   window.appStore.saveConfig(newConfig);
-  showToast('💾 Configuración de la tienda guardada con éxito', 'success');
+  showToast('💾 Configuración guardada localmente', 'success');
+
+  // Auto-sync to GitHub if configured
+  if (window.githubSync.isConfigured()) {
+    await performGlobalGitHubSync();
+  }
 }
 
 function downloadDatabaseFiles() {
@@ -1252,7 +1383,7 @@ function downloadDatabaseFiles() {
   saveBlob(productsBlob, 'products.json');
   setTimeout(() => saveBlob(configBlob, 'config.json'), 300);
 
-  showToast('📥 Descargando products.json y config.json para GitHub main', 'success');
+  showToast('📥 Descargando products.json y config.json', 'success');
 }
 
 function saveBlob(blob, filename) {
@@ -1262,6 +1393,15 @@ function saveBlob(blob, filename) {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 // --- HUD Toast Notifications ---

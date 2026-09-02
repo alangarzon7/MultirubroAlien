@@ -20,80 +20,81 @@ class StoreState {
   }
 
   async loadInitialData() {
-    // 1. Check LocalStorage for saved config
-    const savedConfig = localStorage.getItem('alien_config_v2');
-    if (savedConfig) {
-      try {
-        this.config = JSON.parse(savedConfig);
-      } catch (e) {
-        console.error('Error parsing saved config:', e);
+    const timestamp = Date.now();
+
+    // 1. Fetch freshest config from server/GitHub cache-busted
+    try {
+      const res = await fetch(`data/config.json?_t=${timestamp}`);
+      if (res.ok) {
+        this.config = await res.json();
+      }
+    } catch (e) {
+      console.warn('Could not fetch data/config.json directly, checking localStorage:', e);
+    }
+
+    // Fallback to LocalStorage if offline or fetch failed
+    if (!this.config) {
+      const savedConfig = localStorage.getItem('alien_config_v2');
+      if (savedConfig) {
+        try {
+          this.config = JSON.parse(savedConfig);
+        } catch (e) { }
       }
     }
 
-    if (!this.config || !this.config.promoBanners) {
-      try {
-        const res = await fetch('data/config.json');
-        const defaultCfg = await res.json();
-        this.config = { ...defaultCfg, ...(this.config || {}) };
-        if (!this.config.promoBanners) {
-          this.config.promoBanners = defaultCfg.promoBanners || [];
-        }
-      } catch (e) {
-        console.warn('Could not fetch data/config.json, using fallback');
-        this.config = {
-          storeName: "Multirubro Alien",
-          tagline: "¡Saludos Terrícola! 👽 Nave nodriza activa 24Hs",
-          heroPromoTitle: "🛸 PROMOS INTERGALÁCTICAS DEL DÍA",
-          address: "Pellegrini 146",
-          googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Pellegrini+146",
-          openingHours: "Abierto 24 Horas - Todos los días",
-          whatsapp: "5491112345678",
-          alias: "ALIENS.MULTIRUBRO.MP",
-          cbu: "0000003100098765432109",
-          shippingCost: 1500,
-          freeShippingMinimum: 20000,
-          adminPin: "alien2026",
-          is24HsOpen: true,
-          categories: [
-            "🔥 Promos del Día",
-            "☕ Café y Merienda",
-            "🍦 Helados",
-            "🍟 Snacks & Comidas",
-            "🥤 Bebidas & Energizantes",
-            "🌿 Cannabis & Grow",
-            "🍫 Golosinas & Kiosco"
-          ],
-          promoBanners: [
-            {
-              id: "banner-1",
-              title: "☕ Combo Café Listo & Alfajor",
-              subtitle: "¡Activá tu día con café calentito y algo rico! Pellegrini 146.",
-              image: "assets/flyer_domingo.jpg",
-              badge: "🔥 PROMO DEL DÍA",
-              wspText: "🛸 ¡Hola Multirubro Alien! Quiero pedir la Promo de Café Listo + Alfajor del flyer:"
-            }
-          ]
-        };
-      }
+    if (!this.config) {
+      this.config = {
+        storeName: "Multirubro Alien",
+        tagline: "¡Saludos Terrícola! 👽 Nave nodriza activa 24Hs",
+        heroPromoTitle: "🛸 PROMOS INTERGALÁCTICAS DEL DÍA",
+        address: "Pellegrini 146",
+        googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Pellegrini+146",
+        openingHours: "Abierto 24 Horas - Los 365 días del año",
+        whatsapp: "5491112345678",
+        alias: "ALIENS.MULTIRUBRO.MP",
+        cbu: "0000003100098765432109",
+        shippingCost: 1500,
+        freeShippingMinimum: 20000,
+        adminPin: "alien2026",
+        is24HsOpen: true,
+        categories: [
+          "🔥 Promos del Día",
+          "☕ Café y Merienda",
+          "🍦 Helados",
+          "🍟 Snacks & Comidas",
+          "🥤 Bebidas & Energizantes",
+          "🌿 Cannabis & Grow",
+          "🍫 Golosinas & Kiosco"
+        ],
+        promoBanners: [
+          {
+            id: "banner-1",
+            title: "☕ Combo Café Listo & Alfajor",
+            subtitle: "¡Activá tu día con café calentito y algo rico! Encontranos en Pellegrini 146.",
+            image: "assets/flyer_domingo.jpg",
+            badge: "🔥 PROMO DEL DÍA",
+            wspText: "🛸 ¡Hola Multirubro Alien! Quiero pedir la Promo de Café Listo + Alfajor del flyer:"
+          }
+        ]
+      };
     }
 
-    // 2. Check LocalStorage for saved products
-    const savedProducts = localStorage.getItem('alien_products_v2');
-    if (savedProducts) {
-      try {
-        this.products = JSON.parse(savedProducts);
-      } catch (e) {
-        console.error('Error parsing saved products:', e);
+    // 2. Fetch freshest products from server/GitHub cache-busted
+    try {
+      const res = await fetch(`data/products.json?_t=${timestamp}`);
+      if (res.ok) {
+        this.products = await res.json();
       }
+    } catch (e) {
+      console.warn('Could not fetch data/products.json directly, checking localStorage:', e);
     }
 
     if (!this.products || this.products.length === 0) {
-      try {
-        const res = await fetch('data/products.json');
-        this.products = await res.json();
-      } catch (e) {
-        console.warn('Could not fetch data/products.json');
-        this.products = [];
+      const savedProducts = localStorage.getItem('alien_products_v2');
+      if (savedProducts) {
+        try {
+          this.products = JSON.parse(savedProducts);
+        } catch (e) { }
       }
     }
 

@@ -537,7 +537,7 @@
   </div>
 
   <!-- =========================================================
-       ADMIN PANEL MODAL (PIN PROTECTED)
+       ADMIN PANEL MODAL (PIN PROTECTED + GITHUB AUTO-SYNC)
        ========================================================= -->
   <div id="admin-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-lg z-50 flex items-center justify-center p-4 overflow-y-auto">
     <div class="glass-card max-w-4xl w-full p-5 md:p-7 rounded-2xl border border-purple-500/40 shadow-2xl my-8 relative">
@@ -559,7 +559,7 @@
       <div id="admin-login-view" class="py-12 max-w-sm mx-auto text-center space-y-4">
         <div class="text-5xl animate-bounce">👽</div>
         <h4 class="font-orbitron font-bold text-lg text-white">Acceso a la Nave Nodriza</h4>
-        <p class="text-xs text-gray-400">Ingresa tu clave de administrador para gestionar productos, flyers, precios, stock y configuración.</p>
+        <p class="text-xs text-gray-400">Ingresa tu clave de administrador para gestionar productos, flyers, precios, stock y guardar cambios en GitHub.</p>
 
         <form id="admin-login-form" class="space-y-3">
           <input id="admin-pin-input" type="password" placeholder="Ingresa PIN (default: alien2026)" class="w-full p-3 bg-black/70 border border-purple-500/40 rounded-xl text-center text-sm font-orbitron text-white focus:outline-none focus:border-emerald-400">
@@ -572,6 +572,28 @@
       <!-- VIEW 2: FULL ADMIN DASHBOARD -->
       <div id="admin-dashboard-view" class="hidden space-y-5">
         
+        <!-- GLOBAL GITHUB SYNC ACTION BAR -->
+        <div class="bg-emerald-950/40 border-2 border-emerald-500/50 p-3.5 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 shadow-[0_0_20px_rgba(0,255,102,0.15)]">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">🐙</span>
+            <div>
+              <div class="font-orbitron font-bold text-xs sm:text-sm text-white flex items-center gap-2">
+                <span>SINCRONIZACIÓN CON GITHUB MAIN</span>
+                <span id="gh-status-badge" class="text-[10px] px-2 py-0.5 rounded-full font-tech font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/40">
+                  ⚠️ Token pendiente
+                </span>
+              </div>
+              <p class="text-[11px] text-gray-300">
+                Guardá todos los cambios directamente en tu repositorio para que impacten en vivo para todos los clientes.
+              </p>
+            </div>
+          </div>
+
+          <button id="global-sync-github-btn" class="btn-alien-glow px-4 py-2.5 rounded-xl font-orbitron font-black text-xs flex items-center gap-2 shrink-0 shadow-lg active:scale-95">
+            <span>🚀 GUARDAR CAMBIOS EN GITHUB</span>
+          </button>
+        </div>
+
         <!-- Top Tab Navigation & Logout -->
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-purple-500/30 pb-3">
           <div class="flex flex-wrap gap-1.5 text-xs font-orbitron font-bold">
@@ -588,7 +610,7 @@
               ⚙️ Configuración y Alias
             </button>
             <button data-tab-target="admin-tab-github" class="admin-tab-btn px-3 py-2 rounded-t-lg bg-purple-950/20 text-gray-300 hover:text-white">
-              💾 Guardar en GitHub
+              🔑 Conexión GitHub
             </button>
           </div>
 
@@ -636,8 +658,11 @@
               </div>
 
               <div>
-                <label class="font-orbitron block text-gray-300 mb-1">URL de Imagen / Foto</label>
-                <input id="prod-img-input" type="text" placeholder="https://... o assets/foto.jpg" class="w-full p-2 bg-black/60 border border-purple-500/30 rounded-lg text-white font-orbitron focus:border-emerald-400">
+                <label class="font-orbitron block text-gray-300 mb-1">Foto: Seleccionar Archivo o URL</label>
+                <div class="space-y-1">
+                  <input id="prod-file-input" type="file" accept="image/*" class="w-full text-[10px] text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-orbitron file:bg-purple-900 file:text-white hover:file:bg-purple-800">
+                  <input id="prod-img-input" type="text" placeholder="o pegar URL https://..." class="w-full p-1.5 bg-black/60 border border-purple-500/30 rounded-lg text-[11px] text-white font-orbitron focus:border-emerald-400">
+                </div>
               </div>
 
               <div>
@@ -715,8 +740,11 @@
               </div>
 
               <div>
-                <label class="font-orbitron block text-gray-300 mb-1">Ruta o URL de la Imagen *</label>
-                <input id="banner-img-input" type="text" required placeholder="assets/flyer_domingo.jpg o URL" class="w-full p-2 bg-black/60 border border-purple-500/30 rounded-lg text-white font-orbitron">
+                <label class="font-orbitron block text-gray-300 mb-1">Foto o Flyer: Archivo o URL *</label>
+                <div class="space-y-1">
+                  <input id="banner-file-input" type="file" accept="image/*" class="w-full text-[10px] text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-orbitron file:bg-purple-900 file:text-white hover:file:bg-purple-800">
+                  <input id="banner-img-input" type="text" placeholder="assets/flyer_domingo.jpg o URL" class="w-full p-1.5 bg-black/60 border border-purple-500/30 rounded-lg text-[11px] text-white font-orbitron">
+                </div>
               </div>
 
               <div>
@@ -840,23 +868,32 @@
           </form>
         </div>
 
-        <!-- TAB 5: GITHUB MAIN SYNC & DATABASE BACKUP -->
+        <!-- TAB 5: GITHUB TOKEN & CONNECTION -->
         <div id="admin-tab-github" class="admin-tab-content hidden space-y-4">
-          <div class="glass-card p-5 rounded-xl border border-purple-500/40 space-y-3 text-xs">
+          <div class="glass-card p-5 rounded-xl border border-purple-500/40 space-y-4 text-xs">
             <h4 class="font-orbitron font-bold text-sm text-emerald-400 flex items-center gap-2">
-              <span>🐙</span> Guardado y Sincronización en GitHub Main
+              <span>🔑</span> Configuración de GitHub Token para Guardado Automático
             </h4>
             <p class="text-gray-300 leading-relaxed">
-              Todos los cambios que realizás en este panel se guardan automáticamente en tu navegador (<code class="text-emerald-300">LocalStorage</code>). Para sincronizarlos de forma permanente en el archivo <code class="text-emerald-300">main</code> de GitHub, podés descargar los archivos JSON actualizados o copiar su contenido:
+              Para que los cambios de precios, número de WhatsApp, alias y fotos se guarden de forma permanente en tu repositorio <code class="text-emerald-300 font-bold">alangarzon7/MultirubroAlien</code> (rama <code class="text-emerald-300">main</code>), ingresa tu Token de GitHub:
             </p>
 
-            <div class="flex flex-wrap gap-3 pt-2">
-              <button id="download-json-btn" class="btn-alien-glow px-4 py-2.5 rounded-xl font-orbitron font-bold text-xs flex items-center gap-2">
-                <span>📥 Descargar Archivos data.json</span>
-              </button>
+            <div class="space-y-2">
+              <label class="font-orbitron block text-white font-bold">GitHub Personal Access Token (PAT):</label>
+              <div class="flex gap-2">
+                <input id="gh-token-input" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="flex-1 p-2.5 bg-black/70 border border-purple-500/40 rounded-xl text-white font-mono text-xs focus:border-emerald-400">
+                <button id="save-gh-token-btn" class="btn-alien-glow px-4 py-2.5 rounded-xl font-orbitron font-bold text-xs">
+                  Guardar Token 💾
+                </button>
+              </div>
+              <p class="text-[11px] text-gray-400">
+                💡 ¿Cómo crearlo? Ve a <a href="https://github.com/settings/tokens" target="_blank" class="text-emerald-400 underline font-bold">github.com/settings/tokens</a> -> <em>Generate new token (classic)</em> -> marca la casilla <strong>repo</strong> -> Generar y cópialo aquí. Se guarda de forma privada solo en tu navegador.
+              </p>
+            </div>
 
-              <button id="copy-json-btn" class="btn-purple-glow px-4 py-2.5 rounded-xl font-orbitron font-bold text-xs flex items-center gap-2">
-                <span>📋 Copiar JSON de Productos</span>
+            <div class="border-t border-purple-500/20 pt-3 flex flex-wrap gap-3">
+              <button id="download-json-btn" class="btn-purple-glow px-4 py-2 rounded-xl font-orbitron font-bold text-xs flex items-center gap-2">
+                <span>📥 Descargar Copia JSON</span>
               </button>
 
               <button onclick="if(confirm('¿Restablecer datos a los valores originales?')) window.appStore.resetToDefault();" class="text-gray-400 hover:text-red-400 border border-gray-700 px-3 py-2 rounded-xl font-orbitron text-xs">
@@ -874,6 +911,7 @@
   <script src="js/starfield.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/qrcode.js"></script>
+  <script src="js/github-sync.js"></script>
   <script src="js/state.js"></script>
   <script src="js/app.js"></script>
 </body>
