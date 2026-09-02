@@ -116,12 +116,13 @@ function updateHeaderUI() {
 
   const gmapsLinks = document.querySelectorAll('.gmaps-link');
   gmapsLinks.forEach(link => {
-    link.href = config.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(config.address)}`;
+    link.href = config.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(config.address || 'Pellegrini 146')}`;
   });
 
   const wspLinks = document.querySelectorAll('.wsp-direct-link');
+  const defaultWspUrl = buildWhatsAppUrl(config.whatsapp, '🛸 ¡Hola Multirubro Alien! Vengo de la web y tengo una consulta:');
   wspLinks.forEach(link => {
-    link.href = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent('🛸 ¡Hola Multirubro Alien! Vengo de la web y tengo una consulta:')}`;
+    link.href = defaultWspUrl;
   });
 
   // Update Cart Counters
@@ -331,7 +332,7 @@ function openFlyerLightbox(banner) {
     if (wspBtn) {
       const config = window.appStore.config;
       const customText = banner.wspText || `🛸 ¡Hola Multirubro Alien! Quiero pedir la promo de: ${banner.title}`;
-      wspBtn.href = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(customText)}`;
+      wspBtn.href = buildWhatsAppUrl(config.whatsapp, customText);
     }
 
     modal.classList.remove('hidden');
@@ -720,7 +721,38 @@ function renderCart() {
   if (totalEl) totalEl.textContent = formatCurrency(total);
 }
 
-// --- WhatsApp Checkout Message Construction ---
+// --- WhatsApp Helpers & Checkout ---
+function getCleanWhatsAppPhone(phone) {
+  if (!phone) return '5491112345678';
+  let cleaned = String(phone).replace(/\D/g, ''); // Remove all non-digits (+, spaces, dashes)
+  
+  // If user entered e.g. 2901123456 (10 digits) without 549, format for Argentina WhatsApp:
+  if (cleaned.length === 10 && !cleaned.startsWith('54')) {
+    cleaned = '549' + cleaned;
+  } else if (cleaned.startsWith('54') && !cleaned.startsWith('549') && cleaned.length === 12) {
+    cleaned = '549' + cleaned.substring(2);
+  }
+  return cleaned;
+}
+
+function buildWhatsAppUrl(phone, message) {
+  const cleanPhone = getCleanWhatsAppPhone(phone);
+  const encodedMsg = encodeURIComponent(message);
+  // api.whatsapp.com is universally supported on desktop, mobile Chrome, and mobile Safari
+  return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodedMsg}`;
+}
+
+function openWhatsApp(url) {
+  // Use anchor click method to avoid popup blockers in mobile Safari/Chrome
+  const link = document.createElement('a');
+  link.href = url;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 function handleWhatsAppCheckout() {
   const items = window.appStore.getCartItemsDetailed();
   if (items.length === 0) {
@@ -787,10 +819,10 @@ function handleWhatsAppCheckout() {
   msg += `=====================================\n`;
   msg += `⚠️ *IMPORTANTE:* En breve te envío el comprobante de la transferencia por este chat para que puedan preparar y despachar mi pedido. ¡Muchas gracias! 🚀`;
 
-  const wspUrl = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(msg)}`;
+  const wspUrl = buildWhatsAppUrl(config.whatsapp, msg);
   
   showToast('🚀 ¡Abriendo WhatsApp con tu pedido!', 'success');
-  window.open(wspUrl, '_blank');
+  openWhatsApp(wspUrl);
 }
 
 // --- QR Modal for Instant Payments ---
@@ -890,7 +922,6 @@ async function performGlobalGitHubSync() {
   const syncBtn = document.getElementById('global-sync-github-btn');
   if (!window.githubSync.isConfigured()) {
     showToast('⚠️ Configura tu Token de GitHub en la pestaña "🔑 Conexión GitHub"', 'error');
-    // Switch to GitHub tab
     const ghTabBtn = document.querySelector('[data-tab-target="admin-tab-github"]');
     if (ghTabBtn) ghTabBtn.click();
     return;
@@ -1353,9 +1384,12 @@ async function handleSaveBanner() {
 }
 
 async function handleSaveConfig() {
+  const rawWsp = document.getElementById('admin-cfg-wsp').value.trim();
+  const cleanWsp = getCleanWhatsAppPhone(rawWsp);
+
   const newConfig = {
     storeName: document.getElementById('admin-cfg-store-name').value.trim(),
-    whatsapp: document.getElementById('admin-cfg-wsp').value.trim(),
+    whatsapp: cleanWsp || '5491112345678',
     alias: document.getElementById('admin-cfg-alias').value.trim(),
     cbu: document.getElementById('admin-cfg-cbu').value.trim(),
     accountHolder: document.getElementById('admin-cfg-holder').value.trim(),
