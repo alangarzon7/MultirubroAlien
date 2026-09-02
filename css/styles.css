@@ -1,0 +1,292 @@
+/* =========================================================
+   MULTIRUBRO ALIEN 2.0 - COSMIC NEON STYLESHEET
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --alien-green: #00ff66;
+  --alien-green-bright: #39ff14;
+  --alien-green-glow: rgba(0, 255, 102, 0.35);
+  --alien-green-dark: #008f39;
+  
+  --neon-cyan: #00f0ff;
+  --neon-cyan-glow: rgba(0, 240, 255, 0.35);
+  
+  --cyber-purple: #a855f7;
+  --cyber-purple-glow: rgba(168, 85, 247, 0.35);
+  --cyber-purple-dark: #1e0b36;
+  
+  --cosmic-bg: #06020e;
+  --cosmic-bg-secondary: #0d061c;
+  --cosmic-card: rgba(16, 8, 32, 0.82);
+  --cosmic-card-border: rgba(168, 85, 247, 0.25);
+  
+  --text-white: #f5f3ff;
+  --text-dim: #a19bb8;
+  --hot-pink: #ff007f;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--cosmic-bg);
+  color: var(--text-white);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Background Starfield Canvas */
+#star-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Typography Helpers */
+.font-orbitron {
+  font-family: 'Orbitron', monospace, sans-serif;
+}
+
+.font-tech {
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* Neon Glow Utilities */
+.glow-alien-text {
+  text-shadow: 0 0 10px rgba(0, 255, 102, 0.6), 0 0 20px rgba(0, 255, 102, 0.3);
+}
+
+.glow-cyan-text {
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.6), 0 0 20px rgba(0, 240, 255, 0.3);
+}
+
+.glow-purple-text {
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.6), 0 0 20px rgba(168, 85, 247, 0.3);
+}
+
+.glow-pink-text {
+  text-shadow: 0 0 10px rgba(255, 0, 127, 0.6), 0 0 20px rgba(255, 0, 127, 0.3);
+}
+
+/* 24Hs Neon Sign Badge */
+.neon-sign-24hs {
+  border: 2px solid var(--alien-green);
+  box-shadow: 0 0 15px var(--alien-green-glow), inset 0 0 10px var(--alien-green-glow);
+  animation: neonFlicker 4s infinite alternate;
+}
+
+@keyframes neonFlicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.6), 0 0 30px rgba(0, 255, 102, 0.3), inset 0 0 10px rgba(0, 255, 102, 0.4);
+    opacity: 1;
+  }
+  20%, 24%, 55% {
+    box-shadow: none;
+    opacity: 0.85;
+  }
+}
+
+/* Glassmorphism Panels */
+.glass-panel {
+  background: rgba(14, 7, 28, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--cosmic-card-border);
+}
+
+.glass-card {
+  background: linear-gradient(145deg, rgba(20, 10, 40, 0.85) 0%, rgba(10, 5, 22, 0.9) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(168, 85, 247, 0.22);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(0, 255, 102, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px -10px rgba(0, 255, 102, 0.2), 0 0 20px rgba(168, 85, 247, 0.15);
+}
+
+/* Neon Glow Buttons */
+.btn-alien-glow {
+  background: linear-gradient(135deg, #00ff66 0%, #00c950 100%);
+  color: #04010a;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 800;
+  box-shadow: 0 0 18px rgba(0, 255, 102, 0.45);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-alien-glow:hover {
+  background: linear-gradient(135deg, #39ff14 0%, #00ff66 100%);
+  box-shadow: 0 0 28px rgba(0, 255, 102, 0.75);
+  transform: scale(1.02);
+}
+
+.btn-alien-glow:active {
+  transform: scale(0.98);
+}
+
+.btn-purple-glow {
+  background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+  color: #ffffff;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-purple-glow:hover {
+  background: linear-gradient(135deg, #c084fc 0%, #a855f7 100%);
+  box-shadow: 0 0 24px rgba(168, 85, 247, 0.7);
+  transform: scale(1.02);
+}
+
+/* Pulsing Badge & Cart */
+@keyframes pulseCart {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 0 25px rgba(0, 255, 102, 0.8), 0 0 35px rgba(0, 240, 255, 0.4);
+  }
+}
+
+.pulse-cart {
+  animation: pulseCart 3s infinite ease-in-out;
+}
+
+/* General Scrollbar styling */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080312;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3c1966;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--alien-green);
+}
+
+/* Category Visible Custom Scrollbar */
+.category-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  display: block;
+}
+
+.category-scrollbar::-webkit-scrollbar-track {
+  background: rgba(14, 6, 28, 0.8);
+  border-radius: 10px;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.category-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #00ff66, #a855f7);
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
+}
+
+.category-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #39ff14;
+}
+
+.category-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #00ff66 rgba(14, 6, 28, 0.8);
+}
+
+/* Category Filter Active */
+.category-pill {
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.category-pill.active {
+  background: linear-gradient(135deg, rgba(0, 255, 102, 0.25) 0%, rgba(168, 85, 247, 0.3) 100%);
+  border-color: var(--alien-green);
+  color: var(--alien-green);
+  box-shadow: 0 0 14px rgba(0, 255, 102, 0.45);
+}
+
+/* Floating HUD Toast */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  background: rgba(14, 6, 28, 0.95);
+  border-left: 4px solid var(--alien-green);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 15px rgba(0, 255, 102, 0.3);
+  backdrop-filter: blur(10px);
+  animation: slideInToast 0.3s ease-out forwards;
+}
+
+@keyframes slideInToast {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Promo Flyer Poster Cards */
+.promo-flyer-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgba(0, 255, 102, 0.3);
+  background: #0c0418;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 255, 102, 0.15);
+}
+
+.promo-flyer-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: var(--alien-green);
+  box-shadow: 0 10px 30px rgba(0, 255, 102, 0.3), 0 0 25px rgba(168, 85, 247, 0.3);
+}
+
+/* Out of Stock Card Overlay */
+.out-of-stock-card {
+  opacity: 0.65;
+  filter: grayscale(0.4);
+}
