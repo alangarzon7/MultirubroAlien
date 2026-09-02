@@ -42,6 +42,16 @@ class StoreState {
       }
     }
 
+    // Auto-clean phone number in memory & storage
+    if (this.config && this.config.whatsapp) {
+      let cleaned = String(this.config.whatsapp).replace(/\D/g, '');
+      if (cleaned.length === 10 && !cleaned.startsWith('54')) {
+        cleaned = '549' + cleaned;
+      }
+      this.config.whatsapp = cleaned || '5492964476309';
+      localStorage.setItem('alien_config_v2', JSON.stringify(this.config));
+    }
+
     if (!this.config) {
       this.config = {
         storeName: "Multirubro Alien",
