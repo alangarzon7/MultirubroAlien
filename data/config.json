@@ -25,6 +25,14 @@
   ],
   "promoBanners": [
     {
+      "id": "banner-1788484748600",
+      "title": "sdfsdfsdf",
+      "image": "assets/upload_1788484747072.jpg",
+      "badge": "asdasdas",
+      "subtitle": "adasdasdas",
+      "wspText": "dasdasdasd"
+    },
+    {
       "id": "banner-1",
       "title": "☕ Combo Café Listo & Alfajor",
       "subtitle": "¡Activá tu día con café calentito y algo rico! Encontranos en Pellegrini 146.",
