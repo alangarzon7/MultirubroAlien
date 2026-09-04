@@ -1,5 +1,16 @@
 [
   {
+    "id": "p-1788563169479",
+    "name": "burger enzo",
+    "category": "🍟 Snacks & Comidas",
+    "price": 1555555,
+    "description": "",
+    "image": "assets/upload_1788563166854.png",
+    "badge": "",
+    "inStock": true,
+    "isPromo": false
+  },
+  {
     "id": "p-promo-1",
     "name": "🚀 Combo Alien Nave Nodriza (Gaseosa + Papas + Alfajor)",
     "category": "🔥 Promos del Día",
