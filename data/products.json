@@ -1,5 +1,17 @@
 [
   {
+    "id": "p-1788482537867",
+    "name": "Hamburguesa",
+    "category": "🔥 Promos del Día",
+    "price": 400000,
+    "originalPrice": 30000,
+    "description": "hamburguesa rica",
+    "image": "https://tse3.mm.bing.net/th/id/OIP.ym4WK1gTsF6gZ3-LBxS9YgHaKd?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
+    "badge": "Promo",
+    "inStock": true,
+    "isPromo": true
+  },
+  {
     "id": "p-promo-1",
     "name": "🚀 Combo Alien Nave Nodriza (Gaseosa + Papas + Alfajor)",
     "category": "🔥 Promos del Día",
