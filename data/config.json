@@ -25,6 +25,14 @@
   ],
   "promoBanners": [
     {
+      "id": "banner-1788482953905",
+      "title": "Ha,mburgesa",
+      "image": "https://tse3.mm.bing.net/th/id/OIP.ym4WK1gTsF6gZ3-LBxS9YgHaKd?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
+      "badge": "PROMO IMPERDIBLE",
+      "subtitle": "ASDASDADASD",
+      "wspText": "qUIERO ESTA PROMO DE LA BURGA"
+    },
+    {
       "id": "banner-1",
       "title": "☕ Combo Café Listo & Alfajor",
       "subtitle": "¡Activá tu día con café calentito y algo rico! Encontranos en Pellegrini 146.",
