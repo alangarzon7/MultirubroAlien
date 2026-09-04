@@ -25,28 +25,12 @@
   ],
   "promoBanners": [
     {
-      "id": "banner-1788483599360",
-      "title": "IMPERDIBLE PROMO",
-      "image": "assets/upload_1788483597161.jpg",
-      "badge": "🔥 PROMO DEL DÍA",
-      "subtitle": "el mejor comboo",
-      "wspText": "porfavor dame esto"
-    },
-    {
       "id": "banner-1",
       "title": "☕ Combo Café Listo & Alfajor",
       "subtitle": "¡Activá tu día con café calentito y algo rico! Encontranos en Pellegrini 146.",
       "image": "assets/flyer_domingo.jpg",
       "badge": "🔥 PROMO DEL DÍA",
       "wspText": "🛸 ¡Hola Multirubro Alien! Quiero pedir la Promo de Café Listo + Alfajor del flyer:"
-    },
-    {
-      "id": "banner-2",
-      "title": "🍦 Helados & Postres Galácticos",
-      "subtitle": "Potes de 1/2 y 1 Kilo artesanal con sabores a elección y toppings gratis.",
-      "image": "https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=800&auto=format&fit=crop&q=80",
-      "badge": "🍦 24HS DISPONIBLE",
-      "wspText": "🛸 ¡Hola! Quiero pedir helado artesanal con entrega a domicilio:"
     },
     {
       "id": "banner-3",
