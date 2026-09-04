@@ -11,8 +11,8 @@
   "bankName": "Mercado Pago / Transferencia Bancaria",
   "accountHolder": "Multirubro Alien 24Hs",
   "shippingCost": 1500,
-  "freeShippingMinimum": 20000,
-  "adminPin": "alien2026",
+  "freeShippingMinimum": 5000,
+  "adminPin": "123",
   "is24HsOpen": true,
   "categories": [
     "🔥 Promos del Día",
