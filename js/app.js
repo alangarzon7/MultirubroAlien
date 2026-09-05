@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initImportantSection();
   initAdminModal();
   initSoundToggle();
-  initQrModal();
   initFlyerLightbox();
   initGitHubSyncUI();
 
@@ -580,13 +579,7 @@ function initCartDrawer() {
     });
   }
 
-  // View QR Button
-  const viewQrBtn = document.getElementById('view-qr-btn');
-  if (viewQrBtn) {
-    viewQrBtn.addEventListener('click', () => {
-      openQrModal();
-    });
-  }
+
 
   // WhatsApp Checkout Trigger
   const sendWspBtn = document.getElementById('checkout-whatsapp-btn');
@@ -825,32 +818,7 @@ function handleWhatsAppCheckout() {
   openWhatsApp(wspUrl);
 }
 
-// --- QR Modal for Instant Payments ---
-function initQrModal() {
-  const qrModal = document.getElementById('qr-modal');
-  const closeBtn = document.getElementById('close-qr-modal-btn');
 
-  if (closeBtn && qrModal) {
-    closeBtn.addEventListener('click', () => {
-      qrModal.classList.add('hidden');
-    });
-  }
-}
-
-function openQrModal() {
-  const qrModal = document.getElementById('qr-modal');
-  const canvas = document.getElementById('qr-canvas-element');
-  const aliasText = document.getElementById('qr-modal-alias');
-  const alias = window.appStore.config?.alias || 'ALIENS.MULTIRUBRO.MP';
-
-  if (qrModal && canvas) {
-    if (aliasText) aliasText.textContent = alias;
-    if (window.generateQrCanvas) {
-      window.generateQrCanvas(alias, canvas);
-    }
-    qrModal.classList.remove('hidden');
-  }
-}
 
 // --- Sound Toggle ---
 function initSoundToggle() {

@@ -24,7 +24,7 @@ Plataforma web completa y catálogo interactivo para **Multirubro Alien 2.0**. A
 4. **Carrito de Compras & Checkout WhatsApp**:
    - Drawer lateral fluido con sonido espacial láser opcional.
    - Selector de modalidad: 🛵 **Envío a Domicilio** (con cálculo dinámico de envío y envío gratis) vs 🏬 **Retiro en Local** (gratis).
-   - Cuadro informativo de Transferencia con botón **"Copiar Alias"** en 1 clic y modal con **Código QR** para pago con apps bancarias o Mercado Pago.
+   - Cuadro informativo de Transferencia con botón **"Copiar Alias"** en 1 clic para pago rápido desde apps bancarias o Mercado Pago.
    - Generación automática del mensaje estructurado de WhatsApp listo para enviar con 1 clic.
 
 5. **Panel de Administración (Modo Admin)**:

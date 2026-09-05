@@ -449,13 +449,9 @@
             </div>
 
             <div class="flex items-center gap-1.5 shrink-0">
-              <button id="copy-alias-btn" type="button" class="btn-alien-glow px-2.5 py-1.5 rounded-md text-[10px] font-orbitron flex items-center gap-1 shadow">
+              <button id="copy-alias-btn" type="button" class="btn-alien-glow px-3 py-2 rounded-md text-[11px] font-orbitron flex items-center gap-1.5 shadow">
                 <span>Copiar Alias</span>
                 <span>📋</span>
-              </button>
-
-              <button id="view-qr-btn" type="button" class="btn-purple-glow px-2 py-1.5 rounded-md text-[10px] font-orbitron" title="Ver Código QR">
-                QR 📱
               </button>
             </div>
           </div>
@@ -511,30 +507,6 @@
     </div>
   </div>
 
-  <!-- =========================================================
-       QR MODAL FOR INSTANT TRANSFER
-       ========================================================= -->
-  <div id="qr-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="glass-card max-w-sm w-full p-6 rounded-2xl border-2 border-emerald-400 space-y-4 text-center shadow-[0_0_40px_rgba(0,255,102,0.3)]">
-      <div class="flex items-center justify-between">
-        <h4 class="font-orbitron font-black text-base text-white">ESCANEAR PARA PAGAR 📱</h4>
-        <button id="close-qr-modal-btn" class="text-gray-400 hover:text-white font-bold text-sm">✕</button>
-      </div>
-
-      <div class="flex justify-center p-3 bg-black rounded-xl border border-emerald-500/40">
-        <canvas id="qr-canvas-element" class="w-48 h-48 rounded"></canvas>
-      </div>
-
-      <div>
-        <span class="text-[10px] text-gray-400 block font-tech">ALIAS OFICIAL:</span>
-        <span id="qr-modal-alias" class="font-orbitron font-black text-emerald-400 text-sm">ALIENS.MULTIRUBRO.MP</span>
-      </div>
-
-      <p class="text-[11px] text-gray-300">
-        Abrí tu app de Mercado Pago o banco y transferí con este alias o QR. Recordá enviar el comprobante por WhatsApp.
-      </p>
-    </div>
-  </div>
 
   <!-- =========================================================
        ADMIN PANEL MODAL (PIN PROTECTED + GITHUB AUTO-SYNC)
@@ -562,7 +534,7 @@
         <p class="text-xs text-gray-400">Ingresa tu clave de administrador para gestionar productos, flyers, precios, stock y guardar cambios en GitHub.</p>
 
         <form id="admin-login-form" class="space-y-3">
-          <input id="admin-pin-input" type="password" placeholder="Ingresa PIN (default: alien2026)" class="w-full p-3 bg-black/70 border border-purple-500/40 rounded-xl text-center text-sm font-orbitron text-white focus:outline-none focus:border-emerald-400">
+          <input id="admin-pin-input" type="password" placeholder="Ingresa la contraseña de administrador" class="w-full p-3 bg-black/70 border border-purple-500/40 rounded-xl text-center text-sm font-orbitron text-white focus:outline-none focus:border-emerald-400">
           <button type="submit" class="btn-alien-glow w-full py-3 rounded-xl font-orbitron font-bold text-xs shadow-lg">
             INGRESAR AL MODO ADMIN 🔓
           </button>
@@ -910,7 +882,6 @@
   <!-- Application Core Scripts -->
   <script src="js/starfield.js"></script>
   <script src="js/audio.js"></script>
-  <script src="js/qrcode.js"></script>
   <script src="js/github-sync.js"></script>
   <script src="js/state.js"></script>
   <script src="js/app.js"></script>
