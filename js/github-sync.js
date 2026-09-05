@@ -4,10 +4,25 @@
 
 class GitHubSync {
   constructor() {
-    this.owner = "alangarzon7";
-    this.repo = "MultirubroAlien";
-    this.branch = "main";
+    this.owner = localStorage.getItem("alien_github_owner") || "alangarzon7";
+    this.repo = localStorage.getItem("alien_github_repo") || "MultirubroAlien";
+    this.branch = localStorage.getItem("alien_github_branch") || "main";
     this.tokenKey = "alien_github_token";
+  }
+
+  setRepositoryInfo(owner, repo, branch = "main") {
+    if (owner) {
+      this.owner = owner.trim();
+      localStorage.setItem("alien_github_owner", this.owner);
+    }
+    if (repo) {
+      this.repo = repo.trim();
+      localStorage.setItem("alien_github_repo", this.repo);
+    }
+    if (branch) {
+      this.branch = branch.trim();
+      localStorage.setItem("alien_github_branch", this.branch);
+    }
   }
 
   getToken() {
@@ -27,13 +42,13 @@ class GitHubSync {
     return window.btoa(unescape(encodeURIComponent(str)));
   }
 
-  // Helper to convert ArrayBuffer to Base64
+  // Helper to convert ArrayBuffer to Base64 safely in chunks
   arrayBufferToBase64(buffer) {
-    let binary = '';
     const bytes = new Uint8Array(buffer);
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-      binary += String.fromCharCode(bytes[i]);
+    const chunkSize = 0x8000; // 32KB chunks
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
     }
     return window.btoa(binary);
   }

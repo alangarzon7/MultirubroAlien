@@ -260,7 +260,7 @@ function renderPromos() {
     <div data-banner-id="${b.id}" class="promo-flyer-card group cursor-pointer flex flex-col justify-between">
       <!-- Flyer Image Container -->
       <div class="relative overflow-hidden bg-black/80 aspect-[4/5] sm:aspect-[3/4] flex items-center justify-center">
-        <img src="${b.image || 'assets/flyer_domingo.jpg'}" alt="${escapeHtml(b.title)}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.src='assets/flyer_domingo.jpg'">
+        <img src="${b.image || 'assets/flyer_domingo.jpg'}" alt="${escapeHtml(b.title)}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.onerror=null; this.src='assets/flyer_domingo.jpg'">
         
         <!-- Gradient Overlay -->
         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/30 pointer-events-none"></div>
@@ -412,7 +412,7 @@ function renderProducts() {
         
         <!-- Product Image & Badges -->
         <div class="relative h-44 sm:h-52 bg-purple-950/40 overflow-hidden">
-          <img src="${p.image || 'assets/logo.jpg'}" alt="${escapeHtml(p.name)}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.src='assets/logo.jpg'">
+          <img src="${p.image || 'assets/logo.jpg'}" alt="${escapeHtml(p.name)}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.onerror=null; this.src='assets/logo.jpg'">
           
           <div class="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
             ${isOut ? `
@@ -676,7 +676,7 @@ function renderCart() {
   // Render items list
   itemsContainer.innerHTML = items.map(item => `
     <div class="flex items-center gap-3 p-3 bg-purple-950/40 rounded-xl border border-purple-500/30">
-      <img src="${item.product.image || 'assets/logo.jpg'}" alt="${escapeHtml(item.product.name)}" class="w-14 h-14 rounded-lg object-cover border border-purple-500/40" onerror="this.src='assets/logo.jpg'">
+      <img src="${item.product.image || 'assets/logo.jpg'}" alt="${escapeHtml(item.product.name)}" class="w-14 h-14 rounded-lg object-cover border border-purple-500/40" onerror="this.onerror=null; this.src='assets/logo.jpg'">
       
       <div class="flex-1 min-w-0">
         <h5 class="font-orbitron text-xs text-white font-bold truncate">${escapeHtml(item.product.name)}</h5>
@@ -845,24 +845,36 @@ function initSoundToggle() {
 function initGitHubSyncUI() {
   const saveTokenBtn = document.getElementById('save-gh-token-btn');
   const tokenInput = document.getElementById('gh-token-input');
+  const ownerInput = document.getElementById('gh-owner-input');
+  const repoInput = document.getElementById('gh-repo-input');
   const globalSyncBtn = document.getElementById('global-sync-github-btn');
 
   if (tokenInput) {
     tokenInput.value = window.githubSync.getToken();
   }
+  if (ownerInput) {
+    ownerInput.value = window.githubSync.owner || '';
+  }
+  if (repoInput) {
+    repoInput.value = window.githubSync.repo || '';
+  }
 
   updateGitHubStatusBadge();
 
-  if (saveTokenBtn && tokenInput) {
+  if (saveTokenBtn) {
     saveTokenBtn.addEventListener('click', () => {
-      const token = tokenInput.value.trim();
-      if (!token) {
-        showToast('⚠️ Ingresa un token válido', 'error');
-        return;
+      const token = tokenInput ? tokenInput.value.trim() : '';
+      const owner = ownerInput ? ownerInput.value.trim() : '';
+      const repo = repoInput ? repoInput.value.trim() : '';
+
+      if (owner && repo) {
+        window.githubSync.setRepositoryInfo(owner, repo);
       }
-      window.githubSync.setToken(token);
+      if (token) {
+        window.githubSync.setToken(token);
+      }
       updateGitHubStatusBadge();
-      showToast('🔑 Token de GitHub guardado en este navegador', 'success');
+      showToast('🔑 Conexión de GitHub guardada en este navegador', 'success');
     });
   }
 
@@ -1192,7 +1204,7 @@ function renderAdmin() {
     tableBody.innerHTML = window.appStore.products.map(p => `
       <tr class="border-b border-purple-500/20 hover:bg-purple-950/30 transition-colors">
         <td class="p-3">
-          <img src="${p.image || 'assets/logo.jpg'}" class="w-10 h-10 rounded-lg object-cover border border-purple-500/30" onerror="this.src='assets/logo.jpg'">
+          <img src="${p.image || 'assets/logo.jpg'}" class="w-10 h-10 rounded-lg object-cover border border-purple-500/30" onerror="this.onerror=null; this.src='assets/logo.jpg'">
         </td>
         <td class="p-3">
           <div class="font-orbitron font-bold text-xs text-white">${escapeHtml(p.name)}</div>
@@ -1239,7 +1251,10 @@ async function handleSaveProduct() {
 
   // Handle uploaded file if present
   if (fileInput && fileInput.files && fileInput.files[0]) {
-    const file = fileInput.files[0];
+    let file = fileInput.files[0];
+    showToast('🔄 Optimizando imagen...', 'info');
+    file = await compressImage(file);
+
     if (window.githubSync.isConfigured()) {
       showToast('📤 Subiendo imagen a GitHub...', 'info');
       try {
@@ -1312,7 +1327,10 @@ async function handleSaveBanner() {
 
   // Handle uploaded file if present
   if (fileInput && fileInput.files && fileInput.files[0]) {
-    const file = fileInput.files[0];
+    let file = fileInput.files[0];
+    showToast('🔄 Optimizando flyer...', 'info');
+    file = await compressImage(file, 1000, 0.8);
+
     if (window.githubSync.isConfigured()) {
       showToast('📤 Subiendo flyer a GitHub...', 'info');
       try {
@@ -1402,6 +1420,42 @@ function readFileAsDataURL(file) {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Client-side image compressor: converts heavy mobile camera photos (3-10MB) into ultra-fast web images (<200KB)
+function compressImage(file, maxWidth = 900, quality = 0.75) {
+  return new Promise((resolve) => {
+    if (!file || !file.type || !file.type.startsWith('image/') || file.type.includes('svg')) {
+      return resolve(file);
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          if (!blob) return resolve(file);
+          const cleanName = file.name ? file.name.replace(/\.[^/.]+$/, "") + ".jpg" : "photo.jpg";
+          blob.name = cleanName;
+          resolve(blob);
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = () => resolve(file);
+      img.src = e.target.result;
+    };
+    reader.onerror = () => resolve(file);
     reader.readAsDataURL(file);
   });
 }

@@ -850,12 +850,23 @@
               Para que los cambios de precios, número de WhatsApp, alias y fotos se guarden de forma permanente en tu repositorio <code class="text-emerald-300 font-bold">alangarzon7/MultirubroAlien</code> (rama <code class="text-emerald-300">main</code>), ingresa tu Token de GitHub:
             </p>
 
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="font-orbitron block text-white font-bold mb-1">Usuario de GitHub:</label>
+                <input id="gh-owner-input" type="text" placeholder="Ej: alangarzon7" class="w-full p-2.5 bg-black/70 border border-purple-500/40 rounded-xl text-white font-mono text-xs focus:border-emerald-400">
+              </div>
+              <div>
+                <label class="font-orbitron block text-white font-bold mb-1">Nombre del Repositorio:</label>
+                <input id="gh-repo-input" type="text" placeholder="Ej: MultirubroAlien" class="w-full p-2.5 bg-black/70 border border-purple-500/40 rounded-xl text-white font-mono text-xs focus:border-emerald-400">
+              </div>
+            </div>
+
             <div class="space-y-2">
               <label class="font-orbitron block text-white font-bold">GitHub Personal Access Token (PAT):</label>
               <div class="flex gap-2">
                 <input id="gh-token-input" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="flex-1 p-2.5 bg-black/70 border border-purple-500/40 rounded-xl text-white font-mono text-xs focus:border-emerald-400">
                 <button id="save-gh-token-btn" class="btn-alien-glow px-4 py-2.5 rounded-xl font-orbitron font-bold text-xs">
-                  Guardar Token 💾
+                  Guardar Conexión 💾
                 </button>
               </div>
               <p class="text-[11px] text-gray-400">

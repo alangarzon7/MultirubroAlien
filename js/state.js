@@ -23,23 +23,25 @@ class StoreState {
     const timestamp = Date.now();
 
     // 1. Fetch freshest config from server/GitHub cache-busted
+    let remoteConfig = null;
     try {
       const res = await fetch(`data/config.json?_t=${timestamp}`);
       if (res.ok) {
-        this.config = await res.json();
+        remoteConfig = await res.json();
       }
     } catch (e) {
       console.warn('Could not fetch data/config.json directly, checking localStorage:', e);
     }
 
-    // Fallback to LocalStorage if offline or fetch failed
+    // LocalStorage has precedence if client made edits locally
+    const savedConfig = localStorage.getItem('alien_config_v2');
+    if (savedConfig) {
+      try {
+        this.config = JSON.parse(savedConfig);
+      } catch (e) { }
+    }
     if (!this.config) {
-      const savedConfig = localStorage.getItem('alien_config_v2');
-      if (savedConfig) {
-        try {
-          this.config = JSON.parse(savedConfig);
-        } catch (e) { }
-      }
+      this.config = remoteConfig;
     }
 
     // Auto-clean phone number in memory & storage
@@ -60,12 +62,12 @@ class StoreState {
         address: "Pellegrini 146",
         googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Pellegrini+146",
         openingHours: "Abierto 24 Horas - Los 365 días del año",
-        whatsapp: "5491112345678",
+        whatsapp: "5492964476309",
         alias: "ALIENS.MULTIRUBRO.MP",
         cbu: "0000003100098765432109",
         shippingCost: 1500,
-        freeShippingMinimum: 20000,
-        adminPin: "alien2026",
+        freeShippingMinimum: 5000,
+        adminPin: "123",
         is24HsOpen: true,
         categories: [
           "🔥 Promos del Día",
@@ -90,22 +92,24 @@ class StoreState {
     }
 
     // 2. Fetch freshest products from server/GitHub cache-busted
+    let remoteProducts = null;
     try {
       const res = await fetch(`data/products.json?_t=${timestamp}`);
       if (res.ok) {
-        this.products = await res.json();
+        remoteProducts = await res.json();
       }
     } catch (e) {
       console.warn('Could not fetch data/products.json directly, checking localStorage:', e);
     }
 
+    const savedProducts = localStorage.getItem('alien_products_v2');
+    if (savedProducts) {
+      try {
+        this.products = JSON.parse(savedProducts);
+      } catch (e) { }
+    }
     if (!this.products || this.products.length === 0) {
-      const savedProducts = localStorage.getItem('alien_products_v2');
-      if (savedProducts) {
-        try {
-          this.products = JSON.parse(savedProducts);
-        } catch (e) { }
-      }
+      this.products = remoteProducts || [];
     }
 
     // 3. Load saved cart
