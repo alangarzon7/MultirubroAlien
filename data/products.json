@@ -1,5 +1,16 @@
 [
   {
+    "id": "p-1788631791141",
+    "name": "BEST BURGER",
+    "category": "🔥 Promos del Día",
+    "price": 15000,
+    "description": "LA MEJOR HAMBURGUESA DE CH2",
+    "image": "assets/upload_1788631789101.jpg",
+    "badge": "IMPERDIBLE",
+    "inStock": true,
+    "isPromo": true
+  },
+  {
     "id": "p-1788563169479",
     "name": "burger enzo",
     "category": "🍟 Snacks & Comidas",
